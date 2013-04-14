@@ -55,8 +55,8 @@ class TeaWebApp{
                     $nsClassFile = $nsClassFile[1];
                     require_once Tea::conf()->SITE_PATH . Tea::conf()->PROTECTED_FOLDER . $nsClassFile .'.php';                    
                 }elseif(strpos($routeRs[0], '/')===false){	//自动映射控制器类
-                	$controllerDir = str_replace('controller','',strtolower($routeRs[0]));	//取之controller前面为其控制器目录名
-                	require_once Tea::conf()->SITE_PATH . Tea::conf()->PROTECTED_FOLDER . "module/{$controllerDir}/controller/{$routeRs[0]}.php";
+                	Tea::conf()->MODULE_NAME = $controllerDir = str_replace('controller','',strtolower($routeRs[0])).'/';	//取之controller前面为其控制器目录名
+                	require_once Tea::conf()->SITE_PATH . Tea::conf()->PROTECTED_FOLDER . "{$controllerDir}controller/{$routeRs[0]}.php";
                 }else{
                     require_once Tea::conf()->SITE_PATH . Tea::conf()->PROTECTED_FOLDER . "controller/{$routeRs[0]}.php";
                 }

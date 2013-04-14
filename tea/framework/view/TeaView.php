@@ -280,11 +280,11 @@ class TeaView {
         if($process!=true){
             //includes user defined template tags for template use
             $this->loadTagClass();
-            include Tea::conf()->SITE_PATH . Tea::conf()->PROTECTED_FOLDER . "viewc/$file.php";
+            include Tea::conf()->SITE_PATH . Tea::conf()->PROTECTED_FOLDER . Tea::conf()->MODULE_NAME . "viewc/$file.php";
         }
         else{
-            $cfilename = Tea::conf()->SITE_PATH . Tea::conf()->PROTECTED_FOLDER . "viewc/$file.php";
-            $vfilename = Tea::conf()->SITE_PATH . Tea::conf()->PROTECTED_FOLDER . "view/$file.html";
+            $cfilename = Tea::conf()->SITE_PATH . Tea::conf()->PROTECTED_FOLDER . Tea::conf()->MODULE_NAME . "viewc/$file.php";
+            $vfilename = Tea::conf()->SITE_PATH . Tea::conf()->PROTECTED_FOLDER . Tea::conf()->MODULE_NAME . "view/$file.html";
             
             //if file exist and is not older than the html template file, include the compiled php instead and exit the function
             if(!$forceCompile){
@@ -837,14 +837,22 @@ class TeaView {
         //if first char is '/' then load the files in view root 'view' folder, <!-- '/admin/index' --> view/admin/index.html
         if(substr($file, 0,1)=='/'){
             $file = substr($file, 1);
-            $cfilename = str_replace('\\', '/', Tea::conf()->SITE_PATH) . Tea::conf()->PROTECTED_FOLDER . "viewc/$file.php";
-            $vfilename = str_replace('\\', '/', Tea::conf()->SITE_PATH) . Tea::conf()->PROTECTED_FOLDER . "view/$file.html";
+            
+            $files = explode('/', $file);
+            if ($files[0]==='library')
+            {
+            	$cfilename = str_replace('\\', '/', Tea::conf()->SITE_PATH) . Tea::conf()->PROTECTED_FOLDER . Tea::conf()->MODULE_NAME . "viewc/$file.php";
+            	$vfilename = str_replace('\\', '/', Tea::conf()->SITE_PATH) . "$file.html";
+            }else{
+	            $cfilename = str_replace('\\', '/', Tea::conf()->SITE_PATH) . Tea::conf()->PROTECTED_FOLDER . "viewc/$file.php";
+	            $vfilename = str_replace('\\', '/', Tea::conf()->SITE_PATH) . Tea::conf()->PROTECTED_FOLDER . "view/$file.html";
+        	}
         }
         else{
             $folders = explode('/', $this->mainRenderFolder);
             $file = implode('/', array_splice($folders, 0, -1)).'/'.$file;
-            $cfilename = str_replace('\\', '/', Tea::conf()->SITE_PATH) . Tea::conf()->PROTECTED_FOLDER . "viewc/$file.php";
-            $vfilename = str_replace('\\', '/', Tea::conf()->SITE_PATH) . Tea::conf()->PROTECTED_FOLDER . "view/$file.html";
+            $cfilename = str_replace('\\', '/', Tea::conf()->SITE_PATH) . Tea::conf()->PROTECTED_FOLDER . Tea::conf()->MODULE_NAME . "viewc/$file.php";
+            $vfilename = str_replace('\\', '/', Tea::conf()->SITE_PATH) . Tea::conf()->PROTECTED_FOLDER . Tea::conf()->MODULE_NAME . "view/$file.html";
         }
 
         if(!file_exists($vfilename)){
@@ -863,7 +871,7 @@ class TeaView {
         if(isset ($dynamicFilename) )
             return $dynamicFilename;
             
-        return '<?php include Tea::conf()->SITE_PATH .  Tea::conf()->PROTECTED_FOLDER . "viewc/'.$file.'.php"; ?>';
+        return '<?php include Tea::conf()->SITE_PATH .  Tea::conf()->PROTECTED_FOLDER . Tea::conf()->MODULE_NAME . "viewc/'.$file.'.php"; ?>';
     }
 
     private function convertSet($matches) {

@@ -28,7 +28,7 @@ class TeaSiteMagic{
      */
     public static function displayHome(){
         echo '<div style="font-family:\'Courier New\', Courier, monospace;"><h1>It Works!</h1>';
-        echo '<h3>What now?</h3><p><a href="'. Tea::conf()->APP_URL .'tools/sitemap.html">Generate Sitemap</a> | <a href="'. Tea::conf()->APP_URL .'index.php/gen_site">Generate Controllers</a> | <a href="'. Tea::conf()->APP_URL .'index.php/gen_model">Generate Models</a> | <a href="'. Tea::conf()->APP_URL .'tools/logviewer.html">View Logs</a> | <a href="'. Tea::conf()->APP_URL .'index.php/allurl">View All URLs</a></p>';
+        echo '<h3>What now?</h3><p><a href="'. Tea::conf()->APP_URL .'tools/sitemap.html">Generate Sitemap</a> | <a href="'. Tea::conf()->APP_URL .'index.php/gen_site">Generate Controllers</a> | <a href="'. Tea::conf()->APP_URL .'index.php/gen_component">Generate Components</a> | <a href="'. Tea::conf()->APP_URL .'index.php/gen_model">Generate Models</a> | <a href="'. Tea::conf()->APP_URL .'tools/logviewer.html">View Logs</a> | <a href="'. Tea::conf()->APP_URL .'index.php/allurl">View All URLs</a></p>';
         echo '<br/><strong>Suggested workflow:</strong><ol>
                   <li>Plan your website and draft a sitemap</li>
                   <li>Convert the sitemap into routes.conf.php</li>
@@ -106,7 +106,7 @@ class TeaSiteMagic{
      * Generates Controller class files from routes definition
      */
     public static function buildSite(){
-        include Tea::conf()->SITE_PATH . Tea::conf()->PROTECTED_FOLDER . 'configs/routes.conf.php';
+        include Tea::conf()->SITE_PATH . 'configs/routes.conf.php';
         $controllers = array();
         foreach($route as $req=>$r){
             foreach($r as $rname=>$value){
@@ -118,11 +118,17 @@ class TeaSiteMagic{
         $total = 0;
 
         foreach($controllers as $cname=>$methods){
+        	//模块名
+        	$mname = str_replace('controller','',strtolower($cname));
+        	//对应的service
+        	$sname = str_replace('controller','Service',ucfirst(strtolower($cname)));
+        	//导入service         
+            $importService = "Tea::loadService(\"$mname\",\"$sname\");";
             $filestr = '';
-            $filestr .= "<?php\n\nclass $cname extends TeaController {" ;
+            $filestr .= "<?php\n\n$importService\n\nclass $cname extends TeaController {" ;
             $methods = array_unique($methods);
             //创建模块目录
-            $controllerDir = Tea::conf()->SITE_PATH . Tea::conf()->PROTECTED_FOLDER . "module/".str_replace('controller','',strtolower($cname)).'/controller';	//取之controller前面为其控制器目录名
+            $controllerDir = Tea::conf()->SITE_PATH . Tea::conf()->PROTECTED_FOLDER . "".str_replace('controller','',strtolower($cname)).'/controller';	//取之controller前面为其控制器目录名
             $controllerFile = $controllerDir.'/'.$cname.'.php';
             if(!is_dir($controllerDir)){
             	mkdir($controllerDir,0777,true);	//递归模式创建目录的
@@ -142,5 +148,105 @@ class TeaSiteMagic{
             }
         }
         echo "<span style=\"font-size:190%;font-family: 'Courier New', Courier, monospace;color:#fff;\">Total $total file(s) generated.</span></body></html>";
+    }
+    
+
+    /**
+     * Generates Component class files from routes definition
+     */
+    public static function buildComponent(){
+    	include Tea::conf()->SITE_PATH . 'configs/routes.conf.php';
+    	$module = array();
+    	foreach($route as $req=>$r){
+    		foreach($r as $rname=>$value){
+    			$module[$value[0]][] = $value[1];
+    		}
+    	}
+    
+    	echo "<html><head><title>Tea Site Generator </title></head><body bgcolor=\"#2e3436\">";
+    	$total = 0;
+    
+    	foreach($module as $cname=>$methods){
+    		//模块名
+    		$mname = str_replace('controller','',strtolower($cname));
+    		
+    		//变量名
+    		$dvname = str_replace('controller','Dao',strtolower($cname));
+    		$svname = str_replace('controller','Service',strtolower($cname));
+    		//类名（首字母大写）
+    		$dname = str_replace('controller','Dao',ucfirst(strtolower($cname)));
+    		$sname = str_replace('controller','Service',ucfirst(strtolower($cname)));
+    		$daoStr = '';
+    		$serviceStr = '';
+    		$daoStr .= "<?php\n\nclass $dname extends TeaDao {" ;
+    		//导入dao层
+    		$importDao ="Tea::loadDao(\"$mname\",\"$dname\");";
+    		$serviceStr .= "<?php\n\n$importDao\n\nclass $sname {" ;
+    		$methods = array_unique($methods);
+    		//创建模块目录
+    		$daoDir = Tea::conf()->COM_PATH .str_replace('controller','',strtolower($cname)).'/dao/';	//取之controller前面为其dao目录名
+    		$serviceDir = Tea::conf()->COM_PATH .str_replace('controller','',strtolower($cname)).'/service/';	//取之controller前面为其sercie目录名
+    		$daoFile = $daoDir.$dname.'.php';
+    		$serviceFile = $serviceDir.$sname.'.php';
+    		if(!is_dir($daoDir)){
+    			mkdir($daoDir,0777,true);	//递归模式创建目录的
+    		}
+    		if(!is_dir($serviceDir)){
+    			mkdir($serviceDir,0777,true);	//递归模式创建目录的
+    		}
+    		/*
+    			foreach($methods as $mname){
+    		$dmname = 'test';
+    		$smname = 'test';
+    		if (strpos($mname, 'saveNew') !== FALSE){
+    		$oNmae = str_replace('saveNew','',strtolower($mname));	//单一对象名（下一版本）
+    		$dmname = str_replace('saveNew','insert',strtolower($mname));
+    		$smname = str_replace('saveNew','add',strtolower($mname));
+    		}
+    		$daoStr .= "\n\n\tpublic function $dmname() {\n\t\t\n\t}";
+    		$serviceStr .= "\n\n\tpublic function $smname() {\n\t\techo 'You are visiting '.\$_SERVER['REQUEST_URI'];\n\t}";
+    
+    		}*/
+    		//属性
+    		
+    		$serviceStr .= "\n\n\t//dao层对象实例\n\tprivate \$_$dvname;";
+    		//初始化办法（对象单一性）
+    		$serviceStr .= "\n\n\tpublic function __construct() {\n\t\t\$this->_$dvname = \$this->_$dvname ? \$this->_$dvname : new $dname();\n\t}";
+    		
+    		//添加
+    		$daoStr .= "\n\n\tpublic function inserObject(\$model) {\n\t\t\n\t}";
+    		$serviceStr .= "\n\n\tpublic function addObject(\$model) {\n\t\techo 'You are visiting '.\$_SERVER['REQUEST_URI'];\n\t}";
+    			
+    		//查询
+    		$daoStr .= "\n\n\tpublic function queryObject(\$model,\$options=null) {\n\t\t\n\t}";
+    		$serviceStr .= "\n\n\tpublic function findObject(\$model,\$options=null) {\n\t\techo 'You are visiting '.\$_SERVER['REQUEST_URI'];\n\t}";
+    			
+    		//删除
+    		$daoStr .= "\n\n\tpublic function deleteObject(\$model,\$options=null) {\n\t\t\n\t}";
+    		$serviceStr .= "\n\n\tpublic function deleteObject(\$model,\$options=null) {\n\t\techo 'You are visiting '.\$_SERVER['REQUEST_URI'];\n\t}";
+    
+    		$daoStr .= "\n\n}\n?>";
+    		$serviceStr .= "\n\n}\n?>";
+    		if(file_exists($daoFile)){
+    			echo "<span style=\"font-size:190%;font-family: 'Courier New', Courier, monospace;\"><strong><span style=\"color:#729fbe;\">$dname.php</span></strong><span style=\"color:#fff;\"> <span style=\"color:#fff;\">file exists! Skipped ...</span></span></span><br/><br/>";
+    		}else{
+    		echo "<span style=\"font-size:190%;font-family: 'Courier New', Courier, monospace;\"><span style=\"color:#fff;\">Controller file </span><strong><span style=\"color:#e7c118;\">$dname</span></strong><span style=\"color:#fff;\"> generated.</span></span><br/><br/>";
+    		$total++;
+    		$handle = fopen($daoFile, 'w+');
+    				fwrite($handle, $daoStr);
+    				fclose($handle);
+    		}
+    			
+    		if(file_exists($serviceFile)){
+    		echo "<span style=\"font-size:190%;font-family: 'Courier New', Courier, monospace;\"><strong><span style=\"color:#729fbe;\">$sname.php</span></strong><span style=\"color:#fff;\"> <span style=\"color:#fff;\">file exists! Skipped ...</span></span></span><br/><br/>";
+    		}else{
+    		echo "<span style=\"font-size:190%;font-family: 'Courier New', Courier, monospace;\"><span style=\"color:#fff;\">Controller file </span><strong><span style=\"color:#e7c118;\">$sname</span></strong><span style=\"color:#fff;\"> generated.</span></span><br/><br/>";
+    		$total++;
+    		$handle = fopen($serviceFile, 'w+');
+    		fwrite($handle, $serviceStr);
+    		fclose($handle);
+    		}
+    		}
+    		echo "<span style=\"font-size:190%;font-family: 'Courier New', Courier, monospace;color:#fff;\">Total $total file(s) generated.</span></body></html>";
     }
 }

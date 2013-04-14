@@ -300,7 +300,23 @@ class Tea{
     public static function loadController($class_name){
 		return self::load($class_name, self::conf()->SITE_PATH . Tea::conf()->PROTECTED_FOLDER . 'controller/', false);
     }
-
+    
+    /**
+     * Imports the definition of Dao class(es). Class file is located at <b>SITE_PATH/protected/Dao/</b>
+     * @param string|array DAO妯″潡鐩綍
+     * @param string|array $class_name Name(s) of the Dao class to be imported
+     * @param bool $createObj Determined whether to create object(s) of the class
+     * @return mixed returns NULL by default. If $createObj is TRUE, it creates and return the Object(s) of the class name passed in.
+     */
+   public static function loadDao($module_name,$class_name, $createObj=FALSE){
+	   if(is_string($module_name)===True){
+	    	return self::load($class_name, self::conf()->COM_PATH . $module_name.'/Dao/', $createObj);
+	   }else if(is_array($module_name)===True){
+		    foreach ($module_name as $dir) {
+		    	return self::load($class_name, self::conf()->COM_PATH . $dir.'/Dao/', $createObj);    
+		    }
+	   }
+   }
     /**
      * Imports the definition of Model class(es). Class file is located at <b>SITE_PATH/protected/model/</b>
      * @param string|array $class_name Name(s) of the Model class to be imported
@@ -308,7 +324,21 @@ class Tea{
      * @return mixed returns NULL by default. If $createObj is TRUE, it creates and return the Object(s) of the class name passed in.
      */
     public static function loadModel($class_name, $createObj=FALSE){
-        return self::load($class_name, self::conf()->SITE_PATH . Tea::conf()->PROTECTED_FOLDER . 'model/', $createObj);
+        return self::load($class_name, self::conf()->SITE_PATH . 'model/', $createObj);
+    }
+    
+    /**
+     * 导入serive(单件模式)
+     * @param unknown_type $moduleFolder
+     * @param unknown_type $class_name
+     * @param unknown_type $createObj
+     * @return Ambigous <unknown, unknown, mixed, multitype:unknown >
+     */
+    public static function loadService($moduleFolder=Null, $class_name, $createObj=FALSE){
+    	self::load($class_name, self::conf()->COM_PATH . $moduleFolder.'/service/', false);
+    	if ($createObj === TRUE){
+    		return self::getSingleton($class_name);
+    	}
     }
 
     /**
@@ -540,6 +570,21 @@ class Tea{
         }else{
             return Tea::conf()->SITE_PATH . Tea::conf()->PROTECTED_FOLDER;                            
         }        
+    }
+    
+    /**
+     * 单件模式
+     * @param unknown_type $class
+     * @return unknown
+     */
+    public static function getSingleton($class){
+    	static $instances = array();
+    	if(!array_key_exists($class,$instances)){
+    		$instances[$class] = new $class;
+    	}
+    	$instance = $instances[$class];
+    
+    	return $instance;
     }
 
     /**
