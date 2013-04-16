@@ -10,6 +10,23 @@
 class TeaDao {
 	
 	/**
+	 * Adds a new record. (Prepares and execute the INSERT statements)
+	 * @return int The inserted record's Id
+	 */
+	public function insert($model){
+		return Tea::db()->insert($model);
+	}
+
+	/**
+     * Adds a new record with its associated models. Relational insert. (Prepares and execute the INSERT statements)
+     * @param object $model The model object to be insert.
+     * @param array $rmodels A list of associated model objects to be insert along with the main model.
+     * @return int The inserted record's Id
+     */
+    public function inserRelationObject($model, $rmodels){
+		return Tea::db()->relatedInsert($model, $rmodels);
+	}	
+	/**
 	 * Retrieve the total records in a table. COUNT()
 	 *
 	 * @param array $options Options for the query. Available options see @see find() and additional 'distinct' option

@@ -1,11 +1,11 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<title>Tea Blog Demo - {{title}}</title>
+<title>Tea Blog Demo - <?php echo $data['title']; ?></title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <link rel="Shortcut Icon" href="http://Tea.com/favicon.ico" type="image/x-icon" />
-<link rel="stylesheet" type="text/css" href="{{rootUrl}}global/css/style.css" media="screen" />
-<link rel="stylesheet" type="text/css" href="{{rootUrl}}global/css/demo.css" media="screen" />
+<link rel="stylesheet" type="text/css" href="<?php echo $data['rootUrl']; ?>global/css/style.css" media="screen" />
+<link rel="stylesheet" type="text/css" href="<?php echo $data['rootUrl']; ?>global/css/demo.css" media="screen" />
 
 
 </head>
@@ -13,18 +13,18 @@
 
 <div id="wrap">
 
-<!-- include '/library/top' -->
+<?php include Tea::conf()->SITE_PATH .  Tea::conf()->PROTECTED_FOLDER . Tea::conf()->MODULE_NAME . "viewc/library/top.php"; ?>
 
 <div id="content">
     <div class="left">
         <div class="articles">
-        <h2>{{title}}</h2>
-        {{content}}
+        <h2><?php echo $data['title']; ?></h2>
+        <?php echo $data['content']; ?>
         </div>
     </div>
 
     <div class="right">
-        <!-- include '/library/admin_sidebar' -->
+        <?php include Tea::conf()->SITE_PATH .  Tea::conf()->PROTECTED_FOLDER . Tea::conf()->MODULE_NAME . "viewc/library/admin_sidebar.php"; ?>
     </div>
 
     <div style="clear: both;"> </div>

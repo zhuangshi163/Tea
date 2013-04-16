@@ -71,7 +71,7 @@ class TeaFrontCache{
 			if(isset(Tea::conf()->CACHE_PATH))
 				$this->_directory = Tea::conf()->CACHE_PATH . 'frontend/';
 			else
-				$this->_directory = Tea::conf()->SITE_PATH . Tea::conf()->PROTECTED_FOLDER . 'cache/frontend/';
+				$this->_directory = Tea::conf()->SITE_PATH . Tea::conf()->PROTECTED_FOLDER . Tea::conf()->MODULE_NAME . 'cache/frontend/';
 		}else{
 			$this->_directory = $path;
 		}

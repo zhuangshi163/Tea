@@ -250,7 +250,7 @@ class TeaValidator {
         //$data = array('username'=>'leng s', 'pwd'=>'234231dfasd', 'email'=>'asdb12@#asd.com.my');
         //$rules = array('username'=>array('username'), 'pwd'=>array('password',6,32), 'email'=>array('email'));
         if(is_string($rules)){
-            $rules = include(Tea::conf()->SITE_PATH .  Tea::conf()->PROTECTED_FOLDER . 'config/forms/'.$rules.'.php');
+            $rules = include(Tea::conf()->SITE_PATH . 'configs/forms/'.$rules.'.php');
         }
 
         $optErrorRemove = array();

@@ -1,13 +1,13 @@
 <?php
-class Post{
+class Article{
 
     /**
-     * @var int Max length is 11.  unsigned.
+     * @var int Max length is 11.
      */
     public $id;
 
     /**
-     * @var varchar Max length is 145.
+     * @var varchar Max length is 65.
      */
     public $title;
 
@@ -24,16 +24,16 @@ class Post{
     /**
      * @var tinyint Max length is 1.
      */
-    public $status;
+    public $draft;
 
     /**
-     * @var smallint Max length is 11.  unsigned.
+     * @var int Max length is 10.  unsigned.
      */
-    public $totalcomment;
+    public $food_id;
 
-    public $_table = 'post';
+    public $_table = 'article';
     public $_primarykey = 'id';
-    public $_fields = array('id','title','content','createtime','status','totalcomment');
+    public $_fields = array('id','title','content','createtime','draft','food_id');
 
     public function __construct($properties=null){
 		if($properties!==null){
@@ -49,13 +49,12 @@ class Post{
         return array(
                 'id' => array(
                         array( 'integer' ),
-                        array( 'min', 0 ),
                         array( 'maxlength', 11 ),
                         array( 'optional' ),
                 ),
 
                 'title' => array(
-                        array( 'maxlength', 145 ),
+                        array( 'maxlength', 65 ),
                         array( 'notnull' ),
                 ),
 
@@ -65,20 +64,20 @@ class Post{
 
                 'createtime' => array(
                         array( 'datetime' ),
-                        array( 'optional' ),
+                        array( 'notnull' ),
                 ),
 
-                'status' => array(
+                'draft' => array(
                         array( 'integer' ),
                         array( 'maxlength', 1 ),
                         array( 'optional' ),
                 ),
 
-                'totalcomment' => array(
+                'food_id' => array(
                         array( 'integer' ),
                         array( 'min', 0 ),
-                        array( 'maxlength', 11 ),
-                        array( 'optional' ),
+                        array( 'maxlength', 10 ),
+                        array( 'notnull' ),
                 )
             );
     }

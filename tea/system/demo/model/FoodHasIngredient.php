@@ -1,19 +1,19 @@
 <?php
-class Tag{
+class FoodHasIngredient{
 
     /**
-     * @var int Max length is 11.  unsigned.
+     * @var int Max length is 10.  unsigned.
      */
-    public $id;
+    public $food_id;
 
     /**
-     * @var varchar Max length is 145.
+     * @var int Max length is 10.  unsigned.
      */
-    public $name;
+    public $ingredient_id;
 
-    public $_table = 'tag';
-    public $_primarykey = 'id';
-    public $_fields = array('id','name');
+    public $_table = 'food_has_ingredient';
+    public $_primarykey = 'ingredient_id';
+    public $_fields = array('food_id','ingredient_id');
 
     public function __construct($properties=null){
 		if($properties!==null){
@@ -27,15 +27,17 @@ class Tag{
 
     public function getVRules() {
         return array(
-                'id' => array(
+                'food_id' => array(
                         array( 'integer' ),
                         array( 'min', 0 ),
-                        array( 'maxlength', 11 ),
-                        array( 'optional' ),
+                        array( 'maxlength', 10 ),
+                        array( 'notnull' ),
                 ),
 
-                'name' => array(
-                        array( 'maxlength', 145 ),
+                'ingredient_id' => array(
+                        array( 'integer' ),
+                        array( 'min', 0 ),
+                        array( 'maxlength', 10 ),
                         array( 'notnull' ),
                 )
             );

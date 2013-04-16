@@ -15,6 +15,16 @@ class PostTag{
     public $_primarykey = 'post_id';
     public $_fields = array('tag_id','post_id');
 
+    public function __construct($properties=null){
+		if($properties!==null){
+			foreach($properties as $k=>$v){
+				if(in_array($k, $this->_fields))
+                   $this->{$k} = $v;
+            }
+        }
+	}
+
+
     public function getVRules() {
         return array(
                 'tag_id' => array(

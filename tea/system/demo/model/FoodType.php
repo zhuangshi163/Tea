@@ -1,17 +1,17 @@
 <?php
-class Tag{
+class FoodType{
 
     /**
-     * @var int Max length is 11.  unsigned.
+     * @var int Max length is 10.  unsigned.
      */
     public $id;
 
     /**
-     * @var varchar Max length is 145.
+     * @var varchar Max length is 65.
      */
     public $name;
 
-    public $_table = 'tag';
+    public $_table = 'food_type';
     public $_primarykey = 'id';
     public $_fields = array('id','name');
 
@@ -30,12 +30,12 @@ class Tag{
                 'id' => array(
                         array( 'integer' ),
                         array( 'min', 0 ),
-                        array( 'maxlength', 11 ),
+                        array( 'maxlength', 10 ),
                         array( 'optional' ),
                 ),
 
                 'name' => array(
-                        array( 'maxlength', 145 ),
+                        array( 'maxlength', 65 ),
                         array( 'notnull' ),
                 )
             );

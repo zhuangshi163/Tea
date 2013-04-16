@@ -120,12 +120,19 @@ class TeaSiteMagic{
         foreach($controllers as $cname=>$methods){
         	//模块名
         	$mname = str_replace('controller','',strtolower($cname));
-        	//对应的service
+        	//对应的service 名
         	$sname = str_replace('controller','Service',ucfirst(strtolower($cname)));
+        	//service 变量名
+        	$svname = str_replace('controller','Service',strtolower($cname));
         	//导入service         
             $importService = "Tea::loadService(\"$mname\",\"$sname\");";
             $filestr = '';
             $filestr .= "<?php\n\n$importService\n\nclass $cname extends TeaController {" ;
+            //声明
+            $filestr .="\n\n\t//service层对象\n\tprivate \$_$svname;";
+            //初始化办法（对象单一性）
+            $filestr .= "\n\n\tpublic function __construct() {\n\t\t\$this->_$svname = Tea::getSingleton(\"$sname\");\n\t}";
+            
             $methods = array_unique($methods);
             //创建模块目录
             $controllerDir = Tea::conf()->SITE_PATH . Tea::conf()->PROTECTED_FOLDER . "".str_replace('controller','',strtolower($cname)).'/controller';	//取之controller前面为其控制器目录名

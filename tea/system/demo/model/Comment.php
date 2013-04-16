@@ -45,6 +45,16 @@ class Comment{
     public $_primarykey = 'id';
     public $_fields = array('id','post_id','author','email','content','url','createtime','status');
 
+    public function __construct($properties=null){
+		if($properties!==null){
+			foreach($properties as $k=>$v){
+				if(in_array($k, $this->_fields))
+                   $this->{$k} = $v;
+            }
+        }
+	}
+
+
     public function getVRules() {
         return array(
                 'id' => array(

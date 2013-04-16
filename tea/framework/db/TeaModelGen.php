@@ -191,6 +191,17 @@ class TeaModelGen{
 			$filestr .= "    public \$_fields = array('$fieldnames');\n";
 
 			if($vrules && !empty ($rules)) {
+				if(empty($extends)) {
+					//构造办法
+					$filestr .="\n    public function __construct(\$properties=null){
+		if(\$properties!==null){
+			foreach(\$properties as \$k=>\$v){
+				if(in_array(\$k, \$this->_fields))
+                   \$this->{\$k} = \$v;
+            }
+        }
+	}\n\n";
+				}
 				$filestr .= "\n    public function getVRules() {\n        return ". self::exportRules($rules) ."\n    }\n\n";
 				if(empty($extends)) {
 					$filestr .="    public function validate(\$checkMode='all'){

@@ -1,19 +1,24 @@
 <?php
-class Tag{
+class Recipe{
 
     /**
-     * @var int Max length is 11.  unsigned.
+     * @var int Max length is 11.
      */
     public $id;
 
     /**
-     * @var varchar Max length is 145.
+     * @var text
      */
-    public $name;
+    public $description;
 
-    public $_table = 'tag';
+    /**
+     * @var int Max length is 10.  unsigned.
+     */
+    public $food_id;
+
+    public $_table = 'recipe';
     public $_primarykey = 'id';
-    public $_fields = array('id','name');
+    public $_fields = array('id','description','food_id');
 
     public function __construct($properties=null){
 		if($properties!==null){
@@ -29,13 +34,18 @@ class Tag{
         return array(
                 'id' => array(
                         array( 'integer' ),
-                        array( 'min', 0 ),
                         array( 'maxlength', 11 ),
                         array( 'optional' ),
                 ),
 
-                'name' => array(
-                        array( 'maxlength', 145 ),
+                'description' => array(
+                        array( 'notnull' ),
+                ),
+
+                'food_id' => array(
+                        array( 'integer' ),
+                        array( 'min', 0 ),
+                        array( 'maxlength', 10 ),
                         array( 'notnull' ),
                 )
             );

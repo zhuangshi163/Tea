@@ -18,16 +18,16 @@
 <div id="content">
     <div class="left">
         <p><strong>Editing Post</strong></p>
-        <form method="POST" action="<?php echo $data['rootUrl']; ?>admin/post/saveNew">
+        <form method="POST" action="<?php echo $data['rootUrl']; ?>blog/post/saveNew">
             <span class="field">
                 <strong>Title: </strong><br/>
-                <input type="text" size="60" name="title"/>
+                <input type="text" size="60" name="Post[title]"/>
             </span>
 
 
             <span class="field">
                 <strong>Status: </strong><br/>
-                <select id="status" name="status" style="width:120px;">
+                <select id="status" name="Post[status]" style="width:120px;">
                     <option value="0">Draft</option>
                     <option selected="selected" value="1">Published</option>
                 </select>
@@ -36,7 +36,7 @@
 
             <span class="field">
                 <strong>Content (should use a HTML editor here): </strong><br/>
-                <textarea rows="20" cols="70" name="content"></textarea>
+                <textarea rows="20" cols="70" name="Post[content]"></textarea>
             </span>
 
             <br/><em style="color:#999">Separate different tags with commas.</em><br/>

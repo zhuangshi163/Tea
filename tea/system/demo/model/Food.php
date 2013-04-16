@@ -1,39 +1,34 @@
 <?php
-class Post{
+class Food{
 
     /**
-     * @var int Max length is 11.  unsigned.
+     * @var int Max length is 10.  unsigned.
      */
     public $id;
 
     /**
-     * @var varchar Max length is 145.
+     * @var varchar Max length is 65.
      */
-    public $title;
+    public $name;
 
     /**
      * @var text
      */
-    public $content;
+    public $description;
 
     /**
-     * @var datetime
+     * @var varchar Max length is 65.
      */
-    public $createtime;
+    public $location;
 
     /**
-     * @var tinyint Max length is 1.
+     * @var int Max length is 10.  unsigned.
      */
-    public $status;
+    public $food_type_id;
 
-    /**
-     * @var smallint Max length is 11.  unsigned.
-     */
-    public $totalcomment;
-
-    public $_table = 'post';
+    public $_table = 'food';
     public $_primarykey = 'id';
-    public $_fields = array('id','title','content','createtime','status','totalcomment');
+    public $_fields = array('id','name','description','location','food_type_id');
 
     public function __construct($properties=null){
 		if($properties!==null){
@@ -50,35 +45,29 @@ class Post{
                 'id' => array(
                         array( 'integer' ),
                         array( 'min', 0 ),
-                        array( 'maxlength', 11 ),
+                        array( 'maxlength', 10 ),
                         array( 'optional' ),
                 ),
 
-                'title' => array(
-                        array( 'maxlength', 145 ),
+                'name' => array(
+                        array( 'maxlength', 65 ),
                         array( 'notnull' ),
                 ),
 
-                'content' => array(
+                'description' => array(
                         array( 'notnull' ),
                 ),
 
-                'createtime' => array(
-                        array( 'datetime' ),
-                        array( 'optional' ),
+                'location' => array(
+                        array( 'maxlength', 65 ),
+                        array( 'notnull' ),
                 ),
 
-                'status' => array(
-                        array( 'integer' ),
-                        array( 'maxlength', 1 ),
-                        array( 'optional' ),
-                ),
-
-                'totalcomment' => array(
+                'food_type_id' => array(
                         array( 'integer' ),
                         array( 'min', 0 ),
-                        array( 'maxlength', 11 ),
-                        array( 'optional' ),
+                        array( 'maxlength', 10 ),
+                        array( 'notnull' ),
                 )
             );
     }
