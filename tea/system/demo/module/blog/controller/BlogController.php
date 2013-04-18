@@ -12,9 +12,46 @@ class BlogController extends TeaController {
 		$this->_blogService = new BlogService();
 		//$this->_blogService = Tea::getSingleton("BlogService");
 	}
-	
+	/**
+	 * Display the list of paginated Posts (draft and published)
+	 */
 	function home() {
-		echo 'You are visiting '.$_SERVER['REQUEST_URI'];
+        Tea::loadHelper('TeaPager');
+        Tea::loadModel('Post');
+
+        $p = new Post();
+        
+        //if default, no sorting defined by user, show this as pager link
+        if($this->sortField=='createtime' && $this->orderType=='desc'){
+            $pager = new TeaPager(Tea::conf()->APP_URL.'admin/post/page', $p->count(), 6, 10);
+        }else{
+            $pager = new TeaPager(Tea::conf()->APP_URL."admin/post/sort/$this->sortField/$this->orderType/page", $p->count(), 6, 10);
+        }
+
+        if(isset($this->params['pindex']))
+            $pager->paginate(intval($this->params['pindex']));
+        else
+            $pager->paginate(1);
+
+        $data['rootUrl'] = Tea::conf()->APP_URL;
+        $data['pager'] = $pager->output;
+
+        //Order by ASC or DESC
+        if($this->orderType=='desc'){
+            $data['posts'] = $p->limit($pager->limit, null, $this->sortField,
+                                        //we don't want to select the Content (waste of resources)
+                                        array('select'=>'id,createtime,status,title,totalcomment')
+                                  );
+            $data['order'] = 'asc';
+        }else{
+            $data['posts'] = $p->limit($pager->limit, $this->sortField, null,
+                                        //we don't want to select the Content (waste of resources)
+                                        array('select'=>'id,createtime,status,title,totalcomment')
+                                  );
+            $data['order'] = 'desc';
+        }
+
+        $this->render('admin', $data);
 	}
 
 	function page() {
@@ -56,9 +93,27 @@ class BlogController extends TeaController {
 	}
 
 	function saveNewPost() {
+		/*
+		echo memory_get_usage() , '<br>';
+		$start = memory_get_usage();
+		$a = Array();
+		for ($i=0; $i<10000; $i++) {
+			$a['tao'][$i] = $i + $i;
+		}
+		$mid =  memory_get_usage();
+		echo memory_get_usage() , '<br>';
+		for ($i=10000; $i<20000; $i++) {
+			$a['post'][$i] = $i + $i;
+		}
+		$end =  memory_get_usage();
+		echo memory_get_usage() , '<br>';
+		echo 'argv:', ($mid - $start)/10000 ,'bytes' , '<br>';
+		echo 'argv:',($end - $mid)/10000 ,'bytes' , '<br>';
+		die;*/
+		
 	    Tea::loadHelper('TeaValidator');
 
-        $_POST['Post']['content'] = trim($_POST['Post']['content']);
+        $_POST['post']['content'] = trim($_POST['post']['content']);
 
         //get defined rules and add show some error messages
         $validator = new TeaValidator;
@@ -66,18 +121,11 @@ class BlogController extends TeaController {
         //$validator->checkMode = TeaValidator::CHECK_ALL_ONE;
         //$validator->checkMode = TeaValidator::CHECK_ALL;
         
-        if($error = $validator->validate($_POST, 'post_create.rules')){
-            $data['rootUrl'] = Tea::conf()->APP_URL;
-            $data['title'] =  'Error Occured!';
-            $data['content'] =  '<p style="color:#ff0000;">'.$error.'</p>';
-            $data['content'] .=  '<p>Go <a href="javascript:history.back();">back</a> to edit.</p>';
-            $this->render('admin_msg', $data);
-        }
-        else{
+        if(!$error = $validator->validate($this->changeArrayStructure($_POST), 'post_create.rules')){
             Tea::loadModel('Post');
             Tea::loadModel('Tag');
             Tea::autoload('TeaDbExpression');
-            $p = new Post($_POST);
+            $p = new Post($_POST['post']);
             $p->createtime = new TeaDbExpression('NOW()');
 
             //insert the post along with the tags
@@ -88,14 +136,8 @@ class BlogController extends TeaController {
                     $tg->name = $t;
                     $tags[] = $tg;
                 }
-                $id	= $this->_blogService->addRelationObject($p, $tags);
-                //$id = $p->relatedInsert($tags);
             }
-            //if no tags, just insert the post
-            else{
-            	$id = $this->_blogService->addObject($p);
-            }
-
+            $id = $this->_blogService->addNewPost(array('post'=>$p,'tag'=>$tags));
             //clear the sidebar cache
             Tea::cache('front')->flushAllParts();
 
@@ -104,8 +146,13 @@ class BlogController extends TeaController {
             $data['content'] =  '<p>Your post is created successfully!</p>';
             if($p->status==1)
                 $data['content'] .=  '<p>Click  <a href="'.$data['rootUrl'].'article/'.$id.'">here</a> to view the published post.</p>';
-            $this->render('admin_msg', $data);
-        }
+            $this->render('admin_msg', $data);      
+		}
+		$data['rootUrl'] = Tea::conf()->APP_URL;
+		$data['title'] =  'Error Occured!';
+		$data['content'] =  '<p style="color:#ff0000;">'.$error.'</p>';
+		$data['content'] .=  '<p>Go <a href="javascript:history.back();">back</a> to edit.</p>';
+		$this->render('admin_msg', $data);
 	}
 
 	/**

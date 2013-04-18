@@ -632,4 +632,35 @@ class TeaController {
 		}
 	}
 
+	/**
+	 * 二维数组转换成一维数组(键值以$key_$k方式)
+	 * @param unknown_type $data
+	 * @return unknown array
+	 */
+	public function changeArrayStructure($data){
+
+		foreach($data as $key=>$value){
+			if(is_array($value)){
+				foreach ($value as $k=>$v){
+					$arr[$key.'_'.$k] = $v;
+				}
+			}		
+		}
+		return $arr;
+	}
+	
+	/**
+	 * 改变数组键值显示方式
+	 * @param unknown_type $data
+	 * @param unknown_type $prefix
+	 * @return unknown
+	 */
+	public function changeArrayKey($data,$prefix){
+		if (is_array($data)){
+			foreach($data as $key=>$value){
+				$arr[$prefix.'_'.$key] = $value;
+			}
+			return $arr;
+		}
+	}
 }

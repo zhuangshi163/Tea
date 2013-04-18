@@ -1,0 +1,8 @@
+
+<!-- Generate on 2013-04-18 15:59:24 -->
+<log><date>2013-04-18 15:58:49</date><access_uri><![CDATA[/blog/post/saveNew]]></access_uri><level id="8">PROFILE</level><category>database</category><msg><![CDATA[Begin SQL Profiling Teawebsite]]></msg></log>
+<log><date>2013-04-18 15:58:49</date><access_uri><![CDATA[/blog/post/saveNew]]></access_uri><level id="0">EMERGENCY</level><category>BlogService</category><msg><![CDATA[测试错误信息1]]></msg></log>
+<log><date>2013-04-18 15:58:49</date><access_uri><![CDATA[/blog/post/saveNew]]></access_uri><level id="0">EMERGENCY</level><category>BlogService</category><msg><![CDATA[测试错误信息2]]></msg></log>
+
+<!-- Generate on 2013-04-18 16:08:04 -->
+<log><date>2013-04-18 16:08:04</date><access_uri><![CDATA[/blog/post/saveNew]]></access_uri><level id="0">EMERGENCY</level><category>BlogService</category><msg><![CDATA[Error on line 160 in D:\DefaultWorkspace\GitHub\Tea\tea\framework\db\TeaSqlMagic.php: <b>Failed to open the DB connection</b>]]></msg></log>

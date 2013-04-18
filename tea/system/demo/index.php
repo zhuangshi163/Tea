@@ -11,6 +11,9 @@ include $config['BASE_PATH'].'app/TeaConfig.php';
 //底层Dao
 include $config['BASE_PATH'].'dao/TeaDao.php';
 
+//加载公共辅助类
+Tea::loadHelper("TeaResult");
+
 # Uncomment for auto loading the framework classes.
 //spl_autoload_register('Tea::autoload');
 

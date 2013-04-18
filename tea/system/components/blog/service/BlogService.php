@@ -38,5 +38,27 @@ class BlogService {
 		echo 'You are visiting '.$_SERVER['REQUEST_URI'];
 	}
 
+	/**
+	 * 添加新文章
+	 * @param array $arr 对象数组 
+	 * @return int 新添加的文章id
+	 */
+	public function addNewPost($arr){
+
+		$id = '';	//文章id
+		try {
+			if(isset($arr['post'])){
+				if (isset($arr['tags'])){
+					$id = $this->_blogDao ->inserRelationObject($arr['post'],$arr['tags']);
+				}else {
+					$id = $this->_blogDao ->inserObject($arr['post']);
+				}
+			}
+		} catch (Exception $e) {
+			Tea::logger()->emerg('Error on line '.$e->getLine().' in '.$e->getFile().': <b>'.$e->getMessage().'</b>','BlogService');
+			Tea::logger()->writeLogs();
+		}
+		return $id;
+	}
 }
 ?>

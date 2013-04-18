@@ -46,7 +46,7 @@ $config['APP_URL'] = 'http://'.$_SERVER['HTTP_HOST'].$config['SUBFOLDER'];
  * Path to store logs/profiles when using with the logger tool. This is needed for writing log files and using the log viewer tool
  */
 //$config['LOG_PATH'] = '/var/logs/';
-
+$config['LOG_PATH'] = $config['SITE_PATH'] .'/logs/';
 
 /**
  * defined either Document or Route to be loaded/executed when requested page is not found

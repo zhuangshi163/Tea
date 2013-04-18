@@ -253,8 +253,8 @@ class TeaValidator {
             $rules = include(Tea::conf()->SITE_PATH . 'configs/forms/'.$rules.'.php');
         }
 
-        $optErrorRemove = array();
-
+        $optErrorRemove = array();              
+        
         foreach($data as $dk=>$dv){
             if($this->requireMode == TeaValidator::REQ_MODE_NULL_EMPTY && ($dv === null || $dv === '') ||
 			   $this->requireMode == TeaValidator::REQ_MODE_NULL_ONLY  && $dv === null){
