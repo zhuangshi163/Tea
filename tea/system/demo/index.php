@@ -26,7 +26,7 @@ Tea::conf()->set($config);
 //Tea::useDbReplicate();	#for db replication master-slave usage
 Tea::db()->setMap($dbmap);
 Tea::db()->setDb($dbconfig, $config['APP_MODE']);
-//Tea::db()->sql_tracking = true;	#for debugging/profiling purpose
+Tea::db()->sql_tracking = true;	#for debugging/profiling purpose
 
 Tea::app()->route = $route;
 

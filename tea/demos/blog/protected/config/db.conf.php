@@ -12,7 +12,7 @@ $dbmap['Post']['has_many']['Comment'] = array('foreign_key'=>'post_id');
 $dbmap['Comment']['belongs_to']['Post'] = array('foreign_key'=>'id');
 
 
-$dbconfig['dev'] = array('localhost', 'blog', 'root', '1234', 'mysql', true, 'collate'=>'utf8_unicode_ci', 'charset'=>'utf8');
-$dbconfig['prod'] = array('localhost', 'blog', 'root', '1234', 'mysql', true, 'collate'=>'utf8_unicode_ci', 'charset'=>'utf8');
+$dbconfig['dev'] = array('localhost', 'blog', 'root', '', 'mysql', true, 'collate'=>'utf8_unicode_ci', 'charset'=>'utf8');
+$dbconfig['prod'] = array('localhost', 'blog', 'root', '', 'mysql', true, 'collate'=>'utf8_unicode_ci', 'charset'=>'utf8');
 
 ?>
