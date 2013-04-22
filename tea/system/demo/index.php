@@ -11,6 +11,9 @@ include $config['BASE_PATH'].'app/TeaConfig.php';
 //底层Dao
 include $config['BASE_PATH'].'dao/TeaDao.php';
 
+//底层Service
+include $config['BASE_PATH'].'service/TeaService.php';
+
 //加载公共辅助类
 Tea::loadHelper("TeaResult");
 

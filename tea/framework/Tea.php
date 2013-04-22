@@ -34,6 +34,7 @@ class Tea{
 	protected static $_translator;
     protected static $_globalApps;
 
+    protected static $_instances = array();
     /**
      * @return TeaConfig configuration settings defined in <i>common.conf.php</i>, auto create if the singleton has not been created yet.
      */
@@ -574,17 +575,14 @@ class Tea{
     
     /**
      * 单件模式
-     * @param unknown_type $class
-     * @return unknown
+     * @param string $class
+     * @return BlogService|file/components/service/* the service singleton, auto create if the singleton has not been created yet.
      */
     public static function getSingleton($class){
-    	static $instances = array();
-    	if(!array_key_exists($class,$instances)){
-    		$instances[$class] = new $class;
-    	}
-    	$instance = $instances[$class];
-    
-    	return $instance;
+    	if(!array_key_exists($class,self::$_instances)){
+    		self::$_instances[$class] = new $class;
+    	}    
+    	return self::$_instances[$class];
     }
 
     /**

@@ -13,7 +13,7 @@
 
 <div id="wrap">
 
-<!-- include 'top' -->
+<!-- include '/library/top' -->
 
 <div id="content">
     <div class="left">
@@ -23,14 +23,14 @@
         <div class="articles">
             <table>
               <tbody><tr>
-                <th width="150"><a href="{{rootUrl}}admin/post/sort/status/{{order}}">Status</a></th>
-                <th width="500"><a href="{{rootUrl}}admin/post/sort/title/{{order}}">Title</a></th>
-                <th width="360"><a href="{{rootUrl}}admin/post/sort/createtime/{{order}}">Create Time</a></th>
+                <th width="150"><a href="{{rootUrl}}blog/post/sort/status/{{order}}">Status</a></th>
+                <th width="500"><a href="{{rootUrl}}blog/post/sort/title/{{order}}">Title</a></th>
+                <th width="360"><a href="{{rootUrl}}blog/post/sort/createtime/{{order}}">Create Time</a></th>
               </tr>
               <!-- loop posts -->
               <tr class="trecord">
                 <td><!-- if {{posts' value.@status}}==1 -->Published<!-- else -->Draft<!-- endif --></td>
-                <td><a href="{{rootUrl}}admin/post/edit/{{posts' value.@id}}">{{posts' value.@title}}</a></td>
+                <td><a href="{{rootUrl}}blog/post/edit/{{posts' value.@id}}">{{posts' value.@title}}</a></td>
                 <td>{{formatDate(posts' value.@createtime)}}</td>
               </tr>
               <!-- endloop -->
@@ -42,7 +42,7 @@
     </div>
 
     <div class="right">
-        <!-- include 'admin_sidebar' -->
+        <!-- include '/library/admin_sidebar' -->
     </div>
 
     <div style="clear: both;"> </div>

@@ -8,42 +8,7 @@
  * @license http://www.Tea.com/license
  */ 
 class TeaDao {
-	
-	/**
-	 * Adds a new record. (Prepares and execute the INSERT statements)
-	 * @return int The inserted record's Id
-	 */
-	public function insert($model){
-		return Tea::db()->insert($model);
-	}
 
-	/**
-     * Adds a new record with its associated models. Relational insert. (Prepares and execute the INSERT statements)
-     * @param object $model The model object to be insert.
-     * @param array $rmodels A list of associated model objects to be insert along with the main model.
-     * @return int The inserted record's Id
-     */
-    public function inserRelationObject($model, $rmodels){
-		return Tea::db()->relatedInsert($model, $rmodels);
-	}	
-	/**
-	 * Retrieve the total records in a table. COUNT()
-	 *
-	 * @param array $options Options for the query. Available options see @see find() and additional 'distinct' option
-	 * @return int total of records
-	 */
-	public function count($model,$rmodel=null,$options=null){
-		$options['select'] = isset($options['having']) ? $options['select'] . ', ' : '';
-		if (isset($options['distinct']) && $options['distinct'] == true) {
-			$options['select'] .= 'COUNT(DISTINCT '. $model->_table . '.' . $model->_fields[0] .') as _Teatotal';
-		} else {
-			$options['select'] .= 'COUNT('. $model->_table . '.' . $model->_fields[0] .') as _Teatotal';
-		}
-		$options['asArray'] = true;
-		$options['limit'] = 1;
-		$rs = Tea::db()->find($this, $options);
-		return $rs['_Teatotal'];
-	}
 		
 	protected function queryTableInfo($outConds,$select=array(),$tableName='',$returnFormat=ARRAY_FORMAT,$formatPara=null)
 	{

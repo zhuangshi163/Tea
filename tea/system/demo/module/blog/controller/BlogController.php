@@ -4,67 +4,81 @@ Tea::loadService("blog","BlogService");
 
 class BlogController extends TeaController {
 
+	public $sortField = 'createtime';
+	public $orderType = 'desc';	//排序 or asc
 	public static $tags;
 	
 	private $_blogService;
 	
 	public function __construct() {
-		$this->_blogService = new BlogService();
-		//$this->_blogService = Tea::getSingleton("BlogService");
+		//$this->_blogService = new BlogService();
+		$this->_blogService = Tea::getSingleton("BlogService");
 	}
 	/**
 	 * Display the list of paginated Posts (draft and published)
 	 */
 	function home() {
         Tea::loadHelper('TeaPager');
-        Tea::loadModel('Post');
-
-        $p = new Post();
+        //查询条件
+        $options = NULL;
+        //总记录数
+        $total = $this->_blogService->count('Post', NULL, $options);
+        
         
         //if default, no sorting defined by user, show this as pager link
         if($this->sortField=='createtime' && $this->orderType=='desc'){
-            $pager = new TeaPager(Tea::conf()->APP_URL.'admin/post/page', $p->count(), 6, 10);
+            $pager = new TeaPager(Tea::conf()->APP_URL.'blog/post/page', $total, 6, 10);
         }else{
-            $pager = new TeaPager(Tea::conf()->APP_URL."admin/post/sort/$this->sortField/$this->orderType/page", $p->count(), 6, 10);
+            $pager = new TeaPager(Tea::conf()->APP_URL."blog/post/sort/$this->sortField/$this->orderType/page", $total, 6, 10);
         }
 
         if(isset($this->params['pindex']))
             $pager->paginate(intval($this->params['pindex']));
         else
             $pager->paginate(1);
-
+		
+        //查询条件	还可定制 如：$options['custom'] = ','. $desc .' DESC';
+        $options = array('limit'=>$pager->limit,$this->orderType=>$this->sortField,'select'=>'id,createtime,status,title,totalcomment');
+        $data['posts'] = $this->_blogService->limit('Post', NULL, $options);
+        
         $data['rootUrl'] = Tea::conf()->APP_URL;
         $data['pager'] = $pager->output;
-
-        //Order by ASC or DESC
-        if($this->orderType=='desc'){
-            $data['posts'] = $p->limit($pager->limit, null, $this->sortField,
-                                        //we don't want to select the Content (waste of resources)
-                                        array('select'=>'id,createtime,status,title,totalcomment')
-                                  );
-            $data['order'] = 'asc';
-        }else{
-            $data['posts'] = $p->limit($pager->limit, $this->sortField, null,
-                                        //we don't want to select the Content (waste of resources)
-                                        array('select'=>'id,createtime,status,title,totalcomment')
-                                  );
-            $data['order'] = 'desc';
-        }
-
+        $data['order'] = $this->orderType;	//排序
         $this->render('admin', $data);
 	}
 
 	function page() {
-		
-		echo 'You are visiting '.$_SERVER['REQUEST_URI'];
+		if(isset($this->params['pindex']) && $this->params['pindex']>0)
+			$this->home();
+		else
+			return 404;
 	}
 
 	function sortBy() {
 		echo 'You are visiting '.$_SERVER['REQUEST_URI'];
 	}
 
+
+    /**
+     * Show single blog post for editing
+     */
 	function getArticle() {
-		echo 'You are visiting '.$_SERVER['REQUEST_URI'];
+        Tea::loadModel('Post');
+        $p = new Post();
+        $p->id = intval($this->params['pid']);
+        
+        $result = $this->_blogService->geArticle($p, 'Tag',
+	        									array(
+	                                            'limit'=>'first',
+	                                            'asc'=>'tag.name',
+	                                            'match'=>false      //Post with no tags should be displayed too
+	                                        	)
+        								);
+       if (!$data  = TeaResult::getData($result,false)){       	
+       	return array('/error/postNotFound/'.$p->id,'internal');
+       }        
+        $data['rootUrl'] = Tea::conf()->APP_URL;
+        $this->render('admin_edit_post', $data);
 	}
 
 	function createPost() {
@@ -89,7 +103,57 @@ class BlogController extends TeaController {
 	}
 
 	function savePostChanges() {
-		echo 'You are visiting '.$_SERVER['REQUEST_URI'];
+	        Tea::loadHelper('TeaValidator');
+
+        $_POST['content'] = trim($_POST['content']);
+
+        //get defined rules and add show some error messages
+        $validator = new TeaValidator;
+        $validator->checkMode = TeaValidator::CHECK_SKIP;
+
+        if($error = $validator->validate($_POST, 'post_edit.rules')){
+            $data['rootUrl'] = Tea::conf()->APP_URL;
+            $data['title'] =  'Error Occured!';
+            $data['content'] =  '<p style="color:#ff0000;">'.$error.'</p>';
+            $data['content'] .=  '<p>Go <a href="javascript:history.back();">back</a> to edit.</p>';
+            $this->render('admin_msg', $data);
+        }
+        else{
+            Tea::loadModel('Post');
+            Tea::loadModel('Tag');
+
+            $p = new Post($_POST);
+
+            //delete the previous linked tags first
+            Tea::loadModel('PostTag');
+            $pt = new PostTag;
+            $pt->post_id = $p->id;
+            $pt->delete();
+
+            //update the post along with the tags
+            if(self::$tags!=Null){
+                $tags = array();
+                foreach(self::$tags as $t){
+                    $tg = new Tag;
+                    $tg->name = $t;
+                    $tags[] = $tg;
+                }
+                $p->relatedUpdate($tags);
+            }
+            //if no tags, just update the post
+            else{
+                $p->update();
+            }
+            
+            //clear the sidebar cache
+            Tea::cache('front')->flushAllParts();
+            
+            $data['rootUrl'] = Tea::conf()->APP_URL;
+            $data['title'] =  'Post Updated!';
+            $data['content'] =  '<p>Your changes is saved successfully.</p>';
+            $data['content'] .=  '<p>Click  <a href="'.$data['rootUrl'].'article/'.$p->id.'">here</a> to view the post.</p>';
+            $this->render('admin_msg', $data);
+        }
 	}
 
 	function saveNewPost() {
@@ -138,15 +202,17 @@ class BlogController extends TeaController {
                 }
             }
             $id = $this->_blogService->addNewPost(array('post'=>$p,'tag'=>$tags));
-            //clear the sidebar cache
-            Tea::cache('front')->flushAllParts();
-
-            $data['rootUrl'] = Tea::conf()->APP_URL;
-            $data['title'] =  'Post Created!';
-            $data['content'] =  '<p>Your post is created successfully!</p>';
-            if($p->status==1)
-                $data['content'] .=  '<p>Click  <a href="'.$data['rootUrl'].'article/'.$id.'">here</a> to view the published post.</p>';
-            $this->render('admin_msg', $data);      
+            if($id){
+	            //clear the sidebar cache
+	            Tea::cache('front')->flushAllParts();
+	
+	            $data['rootUrl'] = Tea::conf()->APP_URL;
+	            $data['title'] =  'Post Created!';
+	            $data['content'] =  '<p>Your post is created successfully!</p>';
+	            if($p->status==1)
+	                $data['content'] .=  '<p>Click  <a href="'.$data['rootUrl'].'article/'.$id.'">here</a> to view the published post.</p>';
+	            $this->render('admin_msg', $data);
+            }      
 		}
 		$data['rootUrl'] = Tea::conf()->APP_URL;
 		$data['title'] =  'Error Occured!';

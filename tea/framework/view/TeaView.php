@@ -421,7 +421,7 @@ class TeaView {
 
         if( !isset($this->tagClassName) ){
             if( !isset(Tea::conf()->PROTECTED_FOLDER_ORI) ){
-                $tagFile = Tea::conf()->SITE_PATH . Tea::conf()->PROTECTED_FOLDER . 'plugin/TemplateTag.php';
+                $tagFile = Tea::conf()->SITE_PATH . 'plugin/TemplateTag.php';
                 $tagcls = 'TemplateTag';
             }else{
                 $tagcls = explode('/', Tea::conf()->PROTECTED_FOLDER);
