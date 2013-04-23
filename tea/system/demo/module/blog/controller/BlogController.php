@@ -67,16 +67,22 @@ class BlogController extends TeaController {
         $p = new Post();
         $p->id = intval($this->params['pid']);
         
-        $result = $this->_blogService->geArticle($p, 'Tag',
+        $result = $this->_blogService->geArticle($p,
 	        									array(
 	                                            'limit'=>'first',
 	                                            'asc'=>'tag.name',
-	                                            'match'=>false      //Post with no tags should be displayed too
+	                                            'match'=>false	      //Post with no tags should be displayed too
 	                                        	)
         								);
-       if (!$data  = TeaResult::getData($result,false)){       	
+       if (!$data['post']  = TeaResult::getData($result,false)){       	
        	return array('/error/postNotFound/'.$p->id,'internal');
-       }        
+       }
+       $data['tags'] = array();
+       foreach($data['post']->Tag as  $t){
+       	$data['tags'][] = $t->name;
+       }
+       $data['tags'] = implode(', ', $data['tags']);
+       
         $data['rootUrl'] = Tea::conf()->APP_URL;
         $this->render('admin_edit_post', $data);
 	}
@@ -101,61 +107,63 @@ class BlogController extends TeaController {
 	function rejectComment() {
 		echo 'You are visiting '.$_SERVER['REQUEST_URI'];
 	}
-
-	function savePostChanges() {
-	        Tea::loadHelper('TeaValidator');
-
-        $_POST['content'] = trim($_POST['content']);
-
-        //get defined rules and add show some error messages
-        $validator = new TeaValidator;
-        $validator->checkMode = TeaValidator::CHECK_SKIP;
-
-        if($error = $validator->validate($_POST, 'post_edit.rules')){
-            $data['rootUrl'] = Tea::conf()->APP_URL;
-            $data['title'] =  'Error Occured!';
-            $data['content'] =  '<p style="color:#ff0000;">'.$error.'</p>';
-            $data['content'] .=  '<p>Go <a href="javascript:history.back();">back</a> to edit.</p>';
-            $this->render('admin_msg', $data);
-        }
-        else{
-            Tea::loadModel('Post');
-            Tea::loadModel('Tag');
-
-            $p = new Post($_POST);
-
-            //delete the previous linked tags first
-            Tea::loadModel('PostTag');
-            $pt = new PostTag;
-            $pt->post_id = $p->id;
-            $pt->delete();
-
-            //update the post along with the tags
-            if(self::$tags!=Null){
-                $tags = array();
-                foreach(self::$tags as $t){
-                    $tg = new Tag;
-                    $tg->name = $t;
-                    $tags[] = $tg;
-                }
-                $p->relatedUpdate($tags);
-            }
-            //if no tags, just update the post
-            else{
-                $p->update();
-            }
-            
-            //clear the sidebar cache
-            Tea::cache('front')->flushAllParts();
-            
-            $data['rootUrl'] = Tea::conf()->APP_URL;
-            $data['title'] =  'Post Updated!';
-            $data['content'] =  '<p>Your changes is saved successfully.</p>';
-            $data['content'] .=  '<p>Click  <a href="'.$data['rootUrl'].'article/'.$p->id.'">here</a> to view the post.</p>';
-            $this->render('admin_msg', $data);
-        }
+	/**
+	 * Save changes made in Post editing
+	 */
+	function savePostChanges(){
+		Tea::loadHelper('TeaValidator');
+	
+		$_POST['content'] = trim($_POST['content']);
+	
+		//get defined rules and add show some error messages
+		$validator = new TeaValidator;
+		$validator->checkMode = TeaValidator::CHECK_SKIP;
+	
+		if($error = $validator->validate($_POST, 'post_edit.rules')){
+			$data['rootUrl'] = Tea::conf()->APP_URL;
+			$data['title'] =  'Error Occured!';
+			$data['content'] =  '<p style="color:#ff0000;">'.$error.'</p>';
+			$data['content'] .=  '<p>Go <a href="javascript:history.back();">back</a> to edit.</p>';
+			$this->render('admin_msg', $data);
+		}
+		else{
+			Tea::loadModel('Post');
+			Tea::loadModel('Tag');
+	
+			$p = new Post($_POST);
+	
+			//delete the previous linked tags first
+			Tea::loadModel('PostTag');
+			$pt = new PostTag;
+			$pt->post_id = $p->id;
+			$pt->delete();
+	
+			//update the post along with the tags
+			if(self::$tags!=Null){
+				$tags = array();
+				foreach(self::$tags as $t){
+					$tg = new Tag;
+					$tg->name = $t;
+					$tags[] = $tg;
+				}
+				$p->relatedUpdate($tags);
+			}
+			//if no tags, just update the post
+			else{
+				$p->update();
+			}
+	
+			//clear the sidebar cache
+			Tea::cache('front')->flushAllParts();
+	
+			$data['rootUrl'] = Tea::conf()->APP_URL;
+			$data['title'] =  'Post Updated!';
+			$data['content'] =  '<p>Your changes is saved successfully.</p>';
+			$data['content'] .=  '<p>Click  <a href="'.$data['rootUrl'].'article/'.$p->id.'">here</a> to view the post.</p>';
+			$this->render('admin_msg', $data);
+		}
 	}
-
+	
 	function saveNewPost() {
 		/*
 		echo memory_get_usage() , '<br>';

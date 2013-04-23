@@ -91,15 +91,9 @@ class BlogService {
 	 * @param unknown_type $options
 	 * @return Ambigous <Ambigous, mixed, NULL, unknown>
 	 */
-	public function geArticle($model,$options=null){
+	public function geArticle($model,$options=NULL,$original=FALSE){
 		try {
-			$rs = self::$_blogDao->queryRelate($model, 'Tag',$options); 
-	
-			foreach($rs['post']->Tag as  $t){
-				$rs['tags'][] = $t->name;
-			}
-			$rs['tags'] = implode(', ', $rs['tags']);
-			
+			$rs = self::$_blogDao->queryRelate($model, 'Tag',$options);			
 		} catch (Exception $e) {
 			$this->writeErrorMessage($e);
 			return TeaResult::error('查到失败');
@@ -107,13 +101,33 @@ class BlogService {
 		return TeaResult::ok($rs);
 	}
 	
-	
+
 //============================================ 更新 ===================================================
 
 //============================================ 其他	==================================================
-	private function writeErrorMessage($e){
+	protected function writeErrorMessage($e){
 		Tea::logger()->emerg('Error on line '.$e->getLine().' in '.$e->getFile().': <b>'.$e->getMessage().'</b>','BlogService');
 		Tea::logger()->writeLogs();
 	}
+	
+	/**
+	 * 递归对象转换为数组
+	 * @param object $obj
+	 * @return array
+	 */
+	protected function object_to_array($obj)
+	{
+		$_arr = is_object($obj) ? get_object_vars($obj) : $obj;
+		if (count($_arr)){
+			foreach ($_arr as $key => $val)
+			{
+				$val = (is_array($val) || is_object($val)) ? $this->object_to_array($val) : $val;
+				$arr[$key] = $val;
+			}			
+			return $arr;
+		}else {
+			return '';
+		}
+	}	
 }
 ?>
