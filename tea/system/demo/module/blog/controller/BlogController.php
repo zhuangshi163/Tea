@@ -62,10 +62,10 @@ class BlogController extends TeaController {
     /**
      * Show single blog post for editing
      */
-	function getArticle() {
+	private function getArticle($id) {
         Tea::loadModel('Post');
         $p = new Post();
-        $p->id = intval($this->params['pid']);
+        $p->id = intval($id);
         
         $result = $this->_blogService->geArticle($p,
 	        									array(
@@ -82,11 +82,14 @@ class BlogController extends TeaController {
        	$data['tags'][] = $t->name;
        }
        $data['tags'] = implode(', ', $data['tags']);
-       
-        $data['rootUrl'] = Tea::conf()->APP_URL;
-        $this->render('admin_edit_post', $data);
+   		return $data;
 	}
 
+	public function editPost(){
+		$data = $this->getArticle($this->params['pid']);
+		$data['rootUrl'] = Tea::conf()->APP_URL;
+		$this->render('admin_edit_post', $data);
+	}
 	function createPost() {
         $data['rootUrl'] = Tea::conf()->APP_URL;
         $this->render('admin_new_post', $data);
@@ -113,13 +116,24 @@ class BlogController extends TeaController {
 	function savePostChanges(){
 		Tea::loadHelper('TeaValidator');
 	
-		$_POST['content'] = trim($_POST['content']);
+		$_POST['post']['content'] = trim($_POST['post']['content']);
 	
 		//get defined rules and add show some error messages
 		$validator = new TeaValidator;
 		$validator->checkMode = TeaValidator::CHECK_SKIP;
+		//$validator->checkMode = TeaValidator::CHECK_ALL;
 	
-		if($error = $validator->validate($_POST, 'post_edit.rules')){
+		if($error = $validator->validate($this->changeArrayStructure($_POST), 'post_edit.rules')){
+			/*//$error = TeaResult::error($error);
+			$data = $this->getArticle($_POST['post']['id']);
+			$data['error'] = $error;
+			//print_r($data);die;
+			unset($error);
+			$data['rootUrl'] = Tea::conf()->APP_URL;
+			
+			$this->render('admin_edit_post', $data);
+			
+			die;*/
 			$data['rootUrl'] = Tea::conf()->APP_URL;
 			$data['title'] =  'Error Occured!';
 			$data['content'] =  '<p style="color:#ff0000;">'.$error.'</p>';
@@ -229,6 +243,20 @@ class BlogController extends TeaController {
 		$this->render('admin_msg', $data);
 	}
 
+	/**
+	 * Validate if post exists
+	 */
+	static function checkPostExist($id){
+		return '';
+		Tea::loadModel('Post');
+		$p = new Post;
+		$p->id = $id;
+	
+		//if Post id doesn't exist, return an error
+		if($p->find(array('limit'=>1, 'select'=>'id'))==Null)
+			return 'Post ID not found in database';
+	}
+	
 	/**
 	 * Validate if tags is less than or equal to 10 tags based on the String seperated by commas.
 	 * Tags cannot be empty 'mytag, tag2,,tag4,  , tag5' (error)

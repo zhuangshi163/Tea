@@ -4,7 +4,8 @@
  * Please refer to TeaConfig class in the API doc for a complete list of configurations
  * Access via Singleton, eg. Tea::conf()->BASE_PATH;
  */
-error_reporting(E_ALL);
+//error_reporting(E_ALL);
+error_reporting(E_ALL^E_NOTICE);
 date_default_timezone_set('Asia/Kuala_Lumpur');
 
 /**

@@ -10,6 +10,6 @@
     <li><a href="<?php echo $data['rootUrl']; ?>">Home</a></li>
     <li><a href="<?php echo $data['rootUrl']; ?>admin">Admin</a></li>
     <li><a href="http://Tea.com/forum">Discuss at forum</a></li>
-	<li><a data-name="favorite" rel="<?php echo $data['rootUrl']; ?>">收藏</a></li>
+	<li><a data-name="favorite" rel="<?php echo $data['rootUrl']; ?>" id="favorite">收藏</a></li>
     </ul>
 </div>

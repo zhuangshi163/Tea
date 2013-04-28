@@ -40,7 +40,7 @@ $route['*']['/blog/post/sort/:sortField/:orderType'] =
 $route['*']['/blog/post/sort/:sortField/:orderType/page/:pindex'] = array('BlogController', 'sortBy');
 
 //blog edit Post
-$route['*']['/blog/post/edit/:pid'] = array('BlogController', 'getArticle');
+$route['*']['/blog/post/edit/:pid'] = array('BlogController', 'editPost');
 
 $route['post']['/blog/post/save'] = array('BlogController', 'savePostChanges');
 
